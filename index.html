@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Koding dan Kecerdasan Artifisial: Misi Kode</title>
+<style>
+:root{--bg:#1b1240;--panel:#2b1f5c;--ink:#f7f4ff;--mut:#c9bfee;--acc:#ffd23f;--ok:#38e0a0;--bad:#ff6b81;--cy:#5bd6ff}
+*{box-sizing:border-box;margin:0}
+html,body{height:100%;background:#0c0722;overflow:hidden;font-family:"Trebuchet MS","Segoe UI",Verdana,sans-serif;color:var(--ink)}
+#wrap{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+#stage{width:1280px;height:720px;flex:none;background:radial-gradient(circle at 15% 0,#3d2a8a,var(--bg) 60%);position:relative;overflow:hidden;border-radius:12px}
+#app{position:absolute;inset:0;padding:26px 56px;display:flex;flex-direction:column}
+#app.c{align-items:center;justify-content:center;text-align:center;gap:18px}
+h1{font-size:68px;line-height:1.1}h2{font-size:40px}h3{font-size:28px;line-height:1.35}
+p{font-size:24px;line-height:1.4;color:var(--mut)}
+.big{font-size:100px}.skill{color:var(--acc);font-weight:700}
+button{font:inherit;font-size:24px;font-weight:700;border:0;border-radius:14px;padding:12px 28px;cursor:pointer;background:var(--acc);color:#1b1240;box-shadow:0 5px 0 #b8940f}
+button:active{transform:translateY(3px);box-shadow:0 2px 0 #b8940f}
+button:focus-visible{outline:4px solid var(--cy)}
+.alt{background:#e3dcff;box-shadow:0 5px 0 #8a7fbf}
+.hud{display:flex;justify-content:space-between;font-size:24px;font-weight:700;margin-bottom:10px}
+.bar{height:12px;background:#0c0722;border-radius:8px;overflow:hidden;margin-bottom:14px}
+.bar i{display:block;height:100%;width:100%;background:var(--cy);transition:width 1s linear}
+.bar i.lo{background:var(--bad)}
+.code{font-family:Consolas,monospace;background:#0c0722;border-radius:12px;padding:10px 18px;font-size:24px;color:#9ef0c3;margin:8px 0;white-space:pre;align-self:flex-start}
+.og{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:12px}
+.opt{text-align:left;background:var(--panel);color:var(--ink);border:3px solid #4b3a96;box-shadow:0 5px 0 #120b30;font-weight:600;font-size:23px;line-height:1.3;min-height:84px}
+.opt.ok{background:#115c43;border-color:var(--ok)}.opt.no{background:#6a2030;border-color:var(--bad)}
+.fb{display:flex;gap:18px;align-items:center;justify-content:space-between;margin-top:14px;padding:12px 18px;border-radius:12px;background:#0c0722;font-size:22px;line-height:1.4}
+.row{display:flex;gap:14px;flex-wrap:wrap;justify-content:center}
+small{font-size:18px;color:var(--mut)}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+</head>
+<body>
+<div id="wrap"><div id="stage"><div id="app"></div></div></div>
+<script>
+// Data soal: [pertanyaan, kode, [jawaban benar, salah, salah, salah], penjelasan]
+const L=[
+{n:"Algoritma",ic:"🧩",sk:"Pemecahan masalah",d:"Pahami cara menyusun langkah penyelesaian masalah secara runtut.",q:[
+["Apa yang dimaksud dengan algoritma?","",["Urutan langkah logis untuk menyelesaikan masalah","Nama bahasa pemrograman","Perangkat keras komputer","Program yang selalu error"],"Algoritma = langkah-langkah logis, berurutan, dan terhingga."],
+["Manakah urutan membuat mi instan yang benar?","",["Rebus air, masukkan mi, tuang bumbu, sajikan","Sajikan, rebus air, tuang bumbu, masukkan mi","Tuang bumbu, sajikan, rebus air, masukkan mi","Masukkan mi, sajikan, rebus air, tuang bumbu"],"Urutan langkah menentukan hasil akhir."],
+["Simbol belah ketupat pada flowchart menandakan...","",["Keputusan (ya/tidak)","Mulai atau selesai","Input data","Proses hitung"],"Belah ketupat dipakai untuk percabangan atau keputusan."],
+["Programmu error dan tugas dikumpulkan 1 jam lagi. Langkah pertama pemecahan masalah?","",["Baca pesan error lalu persempit sumber masalahnya","Hapus semua kode","Salin kode teman tanpa paham","Menyerah dan tidak mengumpulkan"],"Memecah masalah dan membaca petunjuk error adalah kunci problem solving."]]},
+{n:"Variabel dan Tipe Data",ic:"📦",sk:"Manajemen waktu",d:"Kenali wadah data dan jenis-jenisnya. Jawab dengan cepat dan teliti!",q:[
+["Tipe data variabel umur pada kode ini adalah...",'nama = "Sinta"\numur = 16',["Integer (bilangan bulat)","String","Boolean","Float"],"Angka 16 tanpa tanda kutip adalah integer."],
+["Apa itu variabel?","",["Wadah bernama untuk menyimpan data","Perintah untuk menutup program","Jenis kabel jaringan","Hasil akhir program"],"Variabel menyimpan nilai yang bisa dipakai dan diubah."],
+["Apa output kode ini?",'print("5" + "3")',["53","8","Error","5 3"],"Tanda kutip membuat 5 dan 3 menjadi teks, sehingga digabung menjadi 53."],
+["Ada 3 tugas koding dengan tenggat berbeda. Cara terbaik mengatur waktu?","",["Buat daftar prioritas berdasarkan tenggat dan tingkat kesulitan","Kerjakan yang paling mudah saja","Tunda semuanya sampai malam terakhir","Kerjakan acak tanpa rencana"],"Prioritas membuat waktu terpakai efektif."]]},
+{n:"Percabangan dan Perulangan",ic:"🔀",sk:"Adaptasi",d:"Program memilih dan mengulang. Siap beradaptasi dengan kondisi?",q:[
+["Apa output kode ini?",'nilai = 75\nif nilai >= 80:\n    print("Lulus")\nelse:\n    print("Remedial")',["Remedial","Lulus","Error","Tidak ada output"],"75 tidak memenuhi syarat >= 80, jadi cabang else berjalan."],
+["Berapa kali kata tercetak?",'for i in range(3):\n    print("Kode")',["3 kali","1 kali","4 kali","Tak terhingga"],"range(3) menghasilkan 3 putaran: 0, 1, 2."],
+["Kata kunci untuk kondisi tambahan setelah if adalah...","",["elif","loop","stop","then"],"elif dipakai untuk mengecek kondisi lain sebelum else."],
+["Aplikasimu belum sesuai kebutuhan pengguna. Sikap adaptif terbaik?","",["Terima masukan, ubah rancangan, lalu uji lagi","Mempertahankan rancangan apa adanya","Menyalahkan pengguna","Menghapus aplikasi"],"Adaptasi berarti belajar dari umpan balik dan memperbaiki."]]},
+{n:"Debugging dan Kerja Tim",ic:"🐞",sk:"Kerja sama dan negosiasi",d:"Temukan bug dan sepakati solusi bersama timmu.",q:[
+["Mengapa kode ini error?",'print("Halo)',["Tanda kutip penutup hilang","Kata print salah ketik","Kurang titik koma","Harus huruf besar"],"Teks harus dibuka dan ditutup dengan tanda kutip."],
+["Hasil seharusnya 8 tetapi muncul 2. Jenis bug apa ini?",'total = 5 - 3\nprint(total)',["Logic error (logika salah)","Syntax error","Runtime error","Bukan bug"],"Program jalan, tetapi rumusnya salah: itu logic error."],
+["Kesalahan yang membuat program berhenti saat sedang berjalan disebut...","",["Runtime error","Syntax error","Logic error","Warning desain"],"Runtime error muncul ketika program dieksekusi."],
+["Kamu dan temanmu beda ide fitur. Cara negosiasi terbaik?","",["Dengarkan, bandingkan kelebihan tiap ide, cari kesepakatan","Paksa ide sendiri","Diam dan ikut saja","Kerjakan sendiri-sendiri tanpa bicara"],"Negosiasi yang baik berdasarkan saling mendengar dan bukti."]]},
+{n:"Kecerdasan Artifisial",ic:"🧠",sk:"Berpikir kritis dan etika",d:"Level terakhir! Pahami cara AI belajar dan gunakan dengan bijak.",q:[
+["Machine learning belajar dari...","",["Data","Perasaan","Keberuntungan","Warna layar"],"Model AI dilatih menggunakan data."],
+["AI hanya dilatih dengan satu jenis foto sehingga salah mengenali jenis lain. Masalah ini disebut...","",["Bias data","Overheat","Bug jaringan","Koneksi lambat"],"Data latih yang kurang beragam menimbulkan bias."],
+["Chatbot AI menjawab dengan yakin, tetapi kamu ragu. Langkah terbaik?","",["Cek ulang ke sumber tepercaya","Percaya penuh","Salin tanpa dibaca","Marah kepada AI"],"AI bisa keliru, jadi jawabannya perlu diverifikasi."],
+["Memasukkan data pribadi (NIK, alamat) ke aplikasi AI sembarangan sebaiknya...","",["Dihindari demi keamanan data","Dilakukan agar AI makin pintar","Dibagikan ke teman","Diposting publik"],"Data pribadi harus dijaga (prinsip perlindungan data pribadi)."]]}
+];
+const $=i=>document.getElementById(i),app=$("app");
+let lv=0,qi=0,score=0,ls=0,hp=3,combo=0,tm=20,iv=null,done=false,cor=0,cur=null,ac=null;
+function fit(){$("stage").style.transform="scale("+Math.min(innerWidth/1280,innerHeight/720)+")"}
+addEventListener("resize",fit);fit();
+function beep(f,d,ty){try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();const o=ac.createOscillator(),g=ac.createGain();o.type=ty||"sine";o.frequency.value=f;g.gain.value=.07;g.gain.exponentialRampToValueAtTime(.001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+const good=()=>{beep(660,.15);setTimeout(()=>beep(880,.25),130)},bad=()=>beep(170,.4,"sawtooth");
+const sh=a=>a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;");
+function home(){clearInterval(iv);app.className="c";app.innerHTML=`<div class="big">🚀</div><h1>Misi Kode</h1><h3>Koding dan Kecerdasan Artifisial</h3><p>Jawab kuis di 5 level, jaga 3 nyawamu, dan raih skor tertinggi!</p><button onclick="intro()">Mulai Misi</button><small>Nyalakan suara perangkat agar efek bunyi terdengar.</small>`}
+function intro(){clearInterval(iv);const l=L[lv];qi=0;hp=3;combo=0;cor=0;ls=score;app.className="c";app.innerHTML=`<div class="big">${l.ic}</div><h2>Level ${lv+1}: ${l.n}</h2><p style="max-width:900px">${l.d}</p><p>Soft skill yang dilatih: <span class="skill">${l.sk}</span></p><p>Kamu punya ❤️❤️❤️ dan 20 detik per soal.</p><button onclick="ask()">Siap!</button>`}
+function ask(){cur=L[lv].q[qi];app.className="";done=false;tm=20;cur.idx=sh([0,1,2,3]);
+app.innerHTML=`<div class="hud"><span>${L[lv].ic} Level ${lv+1}/5 · Soal ${qi+1}/4</span><span>${"❤️".repeat(hp)||"💔"}${combo>1?" 🔥x"+combo:""}</span><span>⏱ <b id="tm">20</b> dtk · ⭐ ${score}</span></div><div class="bar"><i id="bar"></i></div><h3>${esc(cur[0])}</h3>${cur[1]?`<div class="code">${esc(cur[1])}</div>`:""}<div class="og">${cur.idx.map((i,k)=>`<button class="opt" data-i="${i}" onclick="pick(${i})">${"ABCD"[k]}. ${esc(cur[2][i])}</button>`).join("")}</div><div id="fb"></div>`;
+clearInterval(iv);iv=setInterval(()=>{if(done)return;tm--;$("tm").textContent=tm;const b=$("bar");b.style.width=(tm/20*100)+"%";b.className=tm<=6?"lo":"";if(tm<=0)finish(false,"Waktu habis!")},1000)}
+function pick(i){if(done)return;document.querySelectorAll(".opt").forEach(b=>{const k=+b.dataset.i;if(k===0)b.classList.add("ok");else if(k===i)b.classList.add("no")});finish(i===0)}
+function finish(ok,pre){done=true;clearInterval(iv);let msg="";
+if(ok){combo++;cor++;const p=100+tm*2+(combo-1)*10;score+=p;good();msg=`✅ Benar! +${p} poin. `}else{combo=0;hp--;bad();msg=`❌ ${pre||"Belum tepat."} `}
+document.querySelectorAll(".opt").forEach(b=>{b.disabled=true;if(+b.dataset.i===0)b.classList.add("ok")});
+const over=hp<=0,last=qi===3;
+$("fb").innerHTML=`<span>${msg}${esc(cur[3])}</span><button onclick="${over?"gameOver()":last?"lvlEnd()":"nextQ()"}">${over?"Lanjut":last?"Hasil Level":"Lanjut"}</button>`}
+function nextQ(){qi++;ask()}
+function gameOver(){app.className="c";app.innerHTML=`<div class="big">💔</div><h2>Nyawamu habis!</h2><p>Tidak apa-apa. Pelajari penjelasannya, lalu coba Level ${lv+1} lagi.</p><button onclick="score=ls;intro()">Ulangi Level</button>`}
+function lvlEnd(){const st=cor>=4?"⭐⭐⭐":cor>=3?"⭐⭐":"⭐";app.className="c";app.innerHTML=`<div class="big">${st}</div><h2>Level ${lv+1} selesai!</h2><p>Benar ${cor} dari 4 soal. Skor sementara: <b style="color:#ffd23f">${score}</b></p><p>Soft skill terlatih: <span class="skill">${L[lv].sk}</span></p><div class="row"><button class="alt" onclick="score=ls;intro()">Ulangi Level</button><button onclick="nextLv()">${lv<4?"Level Berikutnya":"Lihat Skor Akhir"}</button></div>`}
+function nextLv(){if(lv<4){lv++;intro()}else fin()}
+function fin(){const g=score>=2400?"Kode Master 🏆":score>=1700?"Programmer Muda 🌟":"Calon Programmer 🌱";app.className="c";app.innerHTML=`<div class="big">🎉</div><h1>Misi Tuntas!</h1><h3>Skor akhir: ${score}</h3><p>Gelarmu: <b style="color:#ffd23f">${g}</b></p><p><i>Refleksi: Soft skill mana yang paling kamu butuhkan saat bekerja nanti? Ceritakan ke temanmu.</i></p><div class="row"><button onclick="reset()">Main Lagi</button><button class="alt" onclick="cred()">Info Pembuat</button></div>`}
+function cred(){app.className="c";app.innerHTML=`<h2>Informasi Pembuat</h2><p>Kreator: <b style="color:#fff">[Isi Nama Kreator, gelar]</b><br>Organisasi: <b style="color:#fff">[Isi Nama Sekolah/Instansi]</b></p><p><small>Ilustrasi memakai emoji dan elemen CSS. Efek suara dibuat dengan Web Audio API. Soal dan kode game ini dibuat dengan bantuan AI (Claude) dan ditinjau oleh kreator.</small></p><button onclick="reset()">Kembali ke Awal</button>`}
+function reset(){lv=0;score=0;home()}
+home();
+</script>
+</body>
+</html>
